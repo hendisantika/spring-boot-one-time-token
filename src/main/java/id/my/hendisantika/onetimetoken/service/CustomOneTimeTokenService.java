@@ -61,4 +61,8 @@ public class CustomOneTimeTokenService implements OneTimeTokenService {
         }
         return null;
     }
+
+    private boolean isExpired(OttToken ott) {
+        return this.clock.instant().isAfter(ott.getExpiresAt());
+    }
 }
