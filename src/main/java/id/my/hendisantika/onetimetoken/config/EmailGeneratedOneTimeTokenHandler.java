@@ -1,5 +1,6 @@
 package id.my.hendisantika.onetimetoken.config;
 
+import id.my.hendisantika.onetimetoken.model.User;
 import id.my.hendisantika.onetimetoken.service.CustomUserDetailsService;
 import id.my.hendisantika.onetimetoken.service.EmailService;
 import jakarta.servlet.ServletException;
@@ -54,5 +55,10 @@ public class EmailGeneratedOneTimeTokenHandler implements OneTimeTokenGeneration
         this.emailService.sendEmail(email, "One Time Token for the Spring Security Demo App",
                 "Use the following link to sign in into the application: " + magicLink);
         this.redirectHandler.handle(request, response, oneTimeToken);
+    }
+
+    private String getUserEmail(String username) {
+        User user = userDetailsService.loadUserByUsername(username);
+        return user.getEmail();
     }
 }
