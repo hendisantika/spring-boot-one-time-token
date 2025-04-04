@@ -3,14 +3,17 @@ package id.my.hendisantika.onetimetoken.service;
 import id.my.hendisantika.onetimetoken.model.OttToken;
 import id.my.hendisantika.onetimetoken.repository.OttTokenRepository;
 import lombok.NonNull;
+import org.springframework.security.authentication.ott.DefaultOneTimeToken;
 import org.springframework.security.authentication.ott.GenerateOneTimeTokenRequest;
 import org.springframework.security.authentication.ott.OneTimeToken;
+import org.springframework.security.authentication.ott.OneTimeTokenAuthenticationToken;
 import org.springframework.security.authentication.ott.OneTimeTokenService;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -42,5 +45,20 @@ public class CustomOneTimeTokenService implements OneTimeTokenService {
         OttToken ott = new OttToken(token, request.getUsername(), eightHoursFromNow);
         tokenRepository.save(ott);
         return ott;
+    }
+
+    @Override
+    public OneTimeToken consume(OneTimeTokenAuthenticationToken authenticationToken) {
+        Optional<OttToken> ott = tokenRepository.findByTokenValue(authenticationToken.getTokenValue());
+        if (ott.isPresent()) {
+            OttToken token = ott.get();
+            if (!isExpired(token)) {
+                tokenRepository.delete(token);
+                return new DefaultOneTimeToken(token.getTokenValue(), token.getUsername(),
+                        token.getExpiresAt());
+            }
+            tokenRepository.delete(token);
+        }
+        return null;
     }
 }
