@@ -15,7 +15,6 @@
     <description>spring-boot-one-time-token</description>
     <properties>
         <java.version>25</java.version>
-        <spring-security.version>6.4.0</spring-security.version>
     </properties>
     <dependencies>
         <dependency>
